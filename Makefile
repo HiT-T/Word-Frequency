@@ -1,8 +1,11 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c99
 
-outlier: outlier.c
-	$(CC) $(CFLAGS) -o outlier outlier.c
+outlier.o: outlier.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+outlier: outlier.o
+	$(CC) $(CFLAGS) $< -o $@
 
 clean:
-	rm -f outlier
+	rm -f outlier outlier.o
