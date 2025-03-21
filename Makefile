@@ -1,5 +1,7 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c99
+CFLAGS = -Wall -Wextra -std=gnu99
+
+all: outlier
 
 outlier.o: outlier.c
 	$(CC) $(CFLAGS) -c $< -o $@
