@@ -3,8 +3,8 @@
 ## Authors
 | **Name** | **NetID** |
 |----------|-------------|
-| Vishal Nagamalla | vn218 |
-| Yuhan Li | yl2355 |
+| ![Vishal Nagamalla](https://github.com/Vishal-Nagamalla) | vn218 |
+| ![Yuhan Li](https://github.com/HiT-T) | yl2355 |
 
 ---
 
