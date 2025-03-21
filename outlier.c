@@ -9,7 +9,8 @@
 #include <dirent.h>
 #include <errno.h>
 
-#define BUFFER_SIZE 4096
+#define BUFFERSIZE 4096
+#define TOKENSIZE 256
 
 /* Linked list node for word counts */
 typedef struct WordEntry {
@@ -64,6 +65,7 @@ int main(int argc, char *argv[]) {
             } else {
                 o = malloc(sizeof(WordEntry));
                 if (!o) {
+                    fprintf(stderr, "%s: ", w->word);
                     perror("malloc");
                     exit(EXIT_FAILURE);
                 }
@@ -85,8 +87,8 @@ int main(int argc, char *argv[]) {
                 double file_freq = (double)w->count / f->total_words;
                 double overall_freq = (double)o->count / overall_total;
                 double ratio = file_freq / overall_freq;
-                if (ratio > max_ratio ||
-                   (ratio == max_ratio && (max_word == NULL || strcmp(w->word, max_word) < 0))) {
+                if (max_word == NULL || ratio > max_ratio ||
+                   (ratio == max_ratio && strcmp(w->word, max_word) < 0)) {
                     max_ratio = ratio;
                     max_word = w->word;
                 }
@@ -129,6 +131,7 @@ void process_file(const char *filename) {
     /* Allocate and add a new FileData node */
     FileData *fileData = malloc(sizeof(FileData));
     if (!fileData) {
+        fprintf(stderr, "%s: ", filename);
         perror("malloc");
         close(fd);
         exit(EXIT_FAILURE);
@@ -139,18 +142,18 @@ void process_file(const char *filename) {
     fileData->next = files_head;
     files_head = fileData;
     
-    char buffer[BUFFER_SIZE];
+    char buffer[BUFFERSIZE];
     ssize_t bytes_read;
-    char token[BUFFER_SIZE];
+    char token[TOKENSIZE];
     int token_index = 0;
     
     /* Read file in chunks */
-    while ((bytes_read = read(fd, buffer, BUFFER_SIZE)) > 0) {
+    while ((bytes_read = read(fd, buffer, BUFFERSIZE)) > 0) {
         for (ssize_t i = 0; i < bytes_read; i++) {
             if (!isspace(buffer[i])) {
                 // Accumulate characters into token buffer.
                 token[token_index++] = buffer[i];
-                if (token_index >= BUFFER_SIZE - 1) { 
+                if (token_index >= TOKENSIZE - 1) { 
                     // Prevent token buffer overflow
                     token[token_index] = '\0';
                     char *word = process_token(token);
@@ -186,6 +189,7 @@ void process_file(const char *filename) {
         }
     }
     if (bytes_read < 0) {
+        fprintf(stderr, "%s: ", filename);
         perror("read");
     }
     close(fd);
@@ -233,6 +237,7 @@ void add_word(WordEntry **head, const char *word) {
     } else {
         entry = malloc(sizeof(WordEntry));
         if (!entry) {
+            fprintf(stderr, "%s: ", word);
             perror("malloc");
             exit(EXIT_FAILURE);
         }
@@ -279,6 +284,7 @@ char* process_token(char *token) {
     
     char *result = strdup(start);
     if (!result) {
+        fprintf(stderr, "%s: ", token);
         perror("strdup");
         exit(EXIT_FAILURE);
     }
